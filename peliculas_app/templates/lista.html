@@ -14,8 +14,8 @@
         width: 100%;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.8);
-        border-radius: 10px;
-        padding: 10px;
+        border-radius: 5px;
+        padding: 5px;
         z-index: 1;
       }
       
@@ -24,21 +24,31 @@
         flex-direction: column;
         justify-content: center;
       }
+      .btna {
+        -webkit-box-shadow: 10px 10px 5px 0px rgba(3,1,48,1);
+-moz-box-shadow: 10px 10px 5px 0px rgba(3,1,48,1);
+box-shadow: 10px 10px 5px 0px rgba(3,1,48,1);
+margin-bottom: 2rem;
+      }
+      
       
 </style>
-<div class="container mt-5">
-    <h1 class="mb-3 text-center">Lista de Peliculas</h1>
+<div class="container mt-1">
     <form action="{% url 'lista_peliculas' %}" method="get" class="form-inline">
         <div class="form-group">
-          <input type="text" class="form-control" name="q" placeholder="Buscar...">
+          <input type="text" class="form-control" name="q" placeholder="Buscar pelicula...">
         </div>
-        <button type="submit" class="btn btn-primary">Buscar</button>
+        <button type="submit" class="btn btn-transparent"></button>
       </form>
-         
+      <h1 class="mb-3 text-center text-white">Lista de Peliculas</h1>
     <div class="row justify-content-md-center mt-4">
         {% for pelicula in peliculas %}
         <div class="col mb-2 d-grid gap-2 align-self-center">
-            <a class="btn btn-dark card-image" href="{% url 'recomendacion_peliculas' pelicula.id %}" style="background-image: url(https://image.tmdb.org/t/p/w200/{{ pelicula.poster_path }}); background-size: cover; background-position: center center;">
+           {% if pelicula.poster_path != None %}
+            <a class="btn btn-dark btna card-image" href="{% url 'recomendacion_peliculas' pelicula.id %}" style="background-image: url(https://image.tmdb.org/t/p/w200/{{ pelicula.poster_path }}); background-size: cover; background-position: center center;">
+              {% else %}
+              <a>
+              {% endif %}
               <h5 class="h5 d-flex align-items-center justify-content-center" style="height: 50px; background-color: rgba(0, 0, 0, 0.8); border-radius: 10px; padding: 10px; ">{{ pelicula.title }}</h5>
               <img src="https://image.tmdb.org/t/p/w200/{{ pelicula.poster_path }}" alt="{{ pelicula.title }}">
               <p class="d-flex align-items-center justify-content-center" style="height: 50px; background-color: rgba(0, 0, 0, 0.8); border-radius: 10px; padding: 10px;">
@@ -53,10 +63,9 @@
               <div class="card-overlay">
                 <p>{{ pelicula.overview }}</p>
               </div>
+              <div style="position: absolute; bottom: 0; right: 0; background-color: #007bff; color: #fff; padding: 5px 10px; border-top-left-radius: 10px;border-bottom-right-radius: 5px;">{{pelicula.release_date|slice:":4"}}</div>
             </a>
           </div>
-          
-          
         {% empty %}
             <div class="col-md-12">
                 No hay películas disponibles.
@@ -64,19 +73,5 @@
         {% endfor %}
     </div>
   </div>
-  <script>
-    const cards = document.querySelectorAll('.card');
-
-cards.forEach(card => {
-  card.addEventListener('mouseover', () => {
-    card.querySelector('.card-overlay').style.opacity = '1';
-  });
-
-  card.addEventListener('mouseout', () => {
-    card.querySelector('.card-overlay').style.opacity = '0';
-  });
-});
-
-  </script>
 
 {% endblock %}
