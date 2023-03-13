@@ -3,125 +3,146 @@
 {% load custom_filters %}
 
 <style>
-    .card-image {
-        position: relative;
-      }
-      
-      .card-overlay {
-        display: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
-        border-radius: 5px;
-        padding: 5px;
-        z-index: 1;
-      }
-      
-      .card-image:hover .card-overlay {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-      .btna {
-        -webkit-box-shadow: 10px 10px 5px 0px rgba(3,1,48,1);
--moz-box-shadow: 10px 10px 5px 0px rgba(3,1,48,1);
-box-shadow: 10px 10px 5px 0px rgba(3,1,48,1);
-margin-bottom: 2rem;
-      }   
-      /* Estilos para las estrellas de calificación */
-.movie-rating {
-  font-size: 1.5em;
-}
+  .card-image {
+    position: relative;
+  }
 
-.checked {
-  color: orange;
-}
+  .card-overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 5px;
+    padding: 5px;
+    z-index: 1;
+  }
 
+  .card-image:hover .card-overlay {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .btna {
+    -webkit-box-shadow: 10px 10px 5px 0px rgba(3, 1, 48, 1);
+    -moz-box-shadow: 10px 10px 5px 0px rgba(3, 1, 48, 1);
+    box-shadow: 10px 10px 5px 0px rgba(3, 1, 48, 1);
+    margin-bottom: 2rem;
+  }
+
+  /* Estilos para las estrellas de calificación */
+  .movie-rating {
+    font-size: 1.5em;
+  }
+
+  .checked {
+    color: orange;
+  }
 </style>
 <div class="container mt-1">
-    <form action="{% url 'lista_peliculas' %}" method="get" class="form-inline">
-        <div class="form-group">
-          <input type="text" class="form-control" name="q" placeholder="Buscar pelicula...">
-        </div>
-        <button type="submit" class="btn btn-transparent"></button>
-      </form>
-    <div class="row mb-5 mt-4">
-        <div class="col">
-            <img src="https://image.tmdb.org/t/p/w500/{{ pelicula.poster_path }}" alt="{{ pelicula.title }}" class="img-fluid rounded">
-        </div>
-        <div class="col d-grid gap-2 align-self-center">
-            <h1 class="my-4 text-white">{{ pelicula.title }}</h1>
-            <h4 class="text-white">Resumen</h4>
-            <p class="text-white">{{ pelicula.overview }}</p>
-            <h4 class="text-white">Información de la Película</h4>
-            <ul class="text-white">
-                <li><strong>Título Original:</strong> {{ pelicula.original_title }}</li>
-                <li><strong>Fecha de Estreno:</strong> {{ pelicula.release_date }}</li>
-                <li><strong>Género:</strong>
-                    {% for genero in pelicula.genres %}
-                    {% if forloop.first %}
-                    {{ genero.name }}
-                    {% else %}
-                    - {{ genero.name }}
-                    {% endif %}
-                    {% endfor %}
-                </li>
-                <li><strong>Duración:</strong> {{ pelicula.runtime }} minutos</li>
-                <li><strong>Calificación:</strong> {{ pelicula.vote_average }}               
-                  </li>
-                    {% if pelicula.vote_average %}
-                      {% with rating=pelicula.vote_average %}
-                        <div class="movie-rating">
-                          {% for i in 1|lengthrange:10 %}
-                            {% if i <= rating %}
-                              <span class="fa fa-star checked"></span>
-                            {% else %}
-                              <span class="fa fa-star"></span>
-                            {% endif %}
-                          {% endfor %}
-                        </div>
-                      {% endwith %}
-                    {% endif %}
-                    
-            </ul>
-            {% if pelicula.homepage %}
-                    <div class="d-grid gap-2">
-                        <a class="btn btn-primary" href="{{pelicula.homepage}}" target="_blank"><strong>Ver</strong></a>
-                    </div>
-            {% endif %}
-        </div>
+  <form action="{% url 'lista_peliculas' %}" method="get" class="form-inline">
+    <div class="form-group">
+      <input type="text" class="form-control" name="q" placeholder="Buscar pelicula...">
     </div>
-    <h1 class="mb-3 text-center text-white">Recomendación de Películas</h1>
-    <h4 class="text-white">Si te gustó "{{ pelicula.title }}", te recomendamos las siguientes películas:</h4>
-    <div class="row justify-content-md-center mt-4">
-        {% for pelicula in peliculas_similares %}
-        <div class="col mb-2 d-grid gap-2 align-self-center">
-             <a class="btn btn-dark btna card-image" href="{% url 'recomendacion_peliculas' pelicula.id %}" style="background-image: url(https://image.tmdb.org/t/p/w200/{{ pelicula.poster_path }}); background-size: cover; background-position: center center;">
-               <h5 class="h5 d-flex align-items-center justify-content-center" style="height: 50px; background-color: rgba(0, 0, 0, 0.8); border-radius: 10px; padding: 10px; padding: 0 0 0 0">{{ pelicula.title }}</h5>
-               <img src="https://image.tmdb.org/t/p/w200/{{ pelicula.poster_path }}" alt="{{ pelicula.title }}">
-               <p class="d-flex align-items-center justify-content-center" style="height: 50px; background-color: rgba(0, 0, 0, 0.8); border-radius: 10px; padding: 10px;">
-                 {% for genero in pelicula.generos %}
-                   {% if forloop.first %}  
-                     {{ genero }}
-                   {% else %}
-                     - {{ genero }}
-                   {% endif %}
-                 {% endfor %}
-               </p>
-               <div class="card-overlay">
-                 <p style="-webkit-line-clamp: 16; -webkit-box-orient: vertical; display: -webkit-box; overflow: hidden; text-overflow: ellipsis;">{{ pelicula.overview }}</p>
-               </div>
-               <div style="position: absolute; bottom: 0; right: 0; background-color: #007bff; color: #fff; padding: 0px 10px; border-top-left-radius: 10px;border-bottom-right-radius: 5px;">{{pelicula.release_date|slice:":4"}}</div>
-             </a>
-           </div>
-        {% empty %}
-            <div class="col-md-12">
-                No hay películas disponibles.
-            </div>
-        {% endfor %}
+    <button type="submit" class="btn btn-transparent"></button>
+  </form>
+  <div class="row mb-5 mt-4">
+    <div class="col">
+      <img src="https://image.tmdb.org/t/p/w500/{{ pelicula.poster_path }}" alt="{{ pelicula.title }}"
+        class="img-fluid rounded">
+    </div>
+    <div class="col d-grid gap-2 align-self-center">
+      <h1 class="my-4 text-white">{{ pelicula.title }}</h1>
+      <h4 class="text-white">Resumen</h4>
+      <p class="text-white">{{ pelicula.overview }}</p>
+      <h4 class="text-white">Información de la Película</h4>
+      <ul class="text-white">
+        <li><strong>Título Original:</strong> {{ pelicula.original_title }}</li>
+        <li><strong>Fecha de Estreno:</strong> {{ pelicula.release_date }}</li>
+        <li><strong>Género:</strong>
+          {% for genero in pelicula.genres %}
+          {% if forloop.first %}
+          {{ genero.name }}
+          {% else %}
+          - {{ genero.name }}
+          {% endif %}
+          {% endfor %}
+        </li>
+        <li><strong>Duración:</strong> {{ pelicula.runtime }} minutos</li>
+        <li><strong>Calificación:</strong> {{ pelicula.vote_average }}
+        </li>
+        {% if pelicula.vote_average %}
+        {% with rating=pelicula.vote_average %}
+        <div class="movie-rating">
+          {% for i in 1|lengthrange:10 %}
+          {% if i <= rating %} <span class="fa fa-star checked"></span>
+            {% else %}
+            <span class="fa fa-star"></span>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endwith %}
+        {% endif %}
+
+      </ul>
+      {% if pelicula.homepage %}
+      <div class="d-grid gap-2">
+        <a class="btn btn-primary" href="{{pelicula.homepage}}" target="_blank"><strong>Ver</strong></a>
+      </div>
+      {% endif %}
+      
+
     </div>
   </div>
+  <h1 class="mb-3 text-center text-white">Videos relacionados</h1>
+  {% if videos %}
+      <div class="row text-center mb-5">
+      {% for video in videos %}
+      <div class="col">
+      <iframe src="https://www.youtube.com/embed/{{ video.key }}" title="{{ video.name }}" allowfullscreen></iframe>
+      </div>
+      {% endfor %}
+    </div>
+      {% endif %}
+  <h1 class="mb-3 text-center text-white">Recomendación de Películas</h1>
+  <h4 class="text-white">Si te gustó "{{ pelicula.title }}", te recomendamos las siguientes películas:</h4>
+  <div class="row justify-content-md-center mt-4">
+    {% for pelicula in peliculas_similares %}
+    <div class="col mb-2 d-grid gap-2 align-self-center">
+      <a class="btn btn-dark btna card-image" href="{% url 'recomendacion_peliculas' pelicula.id %}"
+        style="background-image: url(https://image.tmdb.org/t/p/w200/{{ pelicula.poster_path }}); background-size: cover; background-position: center center;">
+        <h5 class="h5 d-flex align-items-center justify-content-center"
+          style="height: 50px; background-color: rgba(0, 0, 0, 0.8); border-radius: 10px; padding: 10px; padding: 0 0 0 0">
+          {{ pelicula.title }}</h5>
+        <img src="https://image.tmdb.org/t/p/w200/{{ pelicula.poster_path }}" alt="{{ pelicula.title }}">
+        <p class="d-flex align-items-center justify-content-center"
+          style="height: 50px; background-color: rgba(0, 0, 0, 0.8); border-radius: 10px; padding: 10px;">
+          {% for genero in pelicula.generos %}
+          {% if forloop.first %}
+          {{ genero }}
+          {% else %}
+          - {{ genero }}
+          {% endif %}
+          {% endfor %}
+        </p>
+        <div class="card-overlay">
+          <p
+            style="-webkit-line-clamp: 16; -webkit-box-orient: vertical; display: -webkit-box; overflow: hidden; text-overflow: ellipsis;">
+            {{ pelicula.overview }}</p>
+        </div>
+        <div
+          style="position: absolute; bottom: 0; right: 0; background-color: #007bff; color: #fff; padding: 0px 10px; border-top-left-radius: 10px;border-bottom-right-radius: 5px;">
+          {{pelicula.release_date|slice:":4"}}</div>
+      </a>
+    </div>
+    {% empty %}
+    <div class="col-md-12">
+      No hay películas disponibles.
+    </div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

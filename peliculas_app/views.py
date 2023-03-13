@@ -14,7 +14,11 @@ def recomendacion_peliculas(request, pelicula_id):
     peliculas_similares = recomendar_api(pelicula_id)
     peli = recomendar_sklearn(pelicula)
     peliculas_similares.extend(peli)
-    return render(request, 'recomendacion.html', {'pelicula': pelicula, 'peliculas_similares': peliculas_similares})
+    videos = get_pelicula_video(pelicula_id)
+    return render(request, 'recomendacion.html', 
+                  {'pelicula': pelicula, 
+                   'peliculas_similares': peliculas_similares,
+                   'videos': videos})
 
 def recomendar_sklearn(pelicula):
     url_generos = "https://api.themoviedb.org/3/genre/movie/list"
@@ -52,13 +56,18 @@ def lista_peliculas(request):
     if 'q' in request.GET:
         query = request.GET['q']
         peliculas = buscar_peliculas(query)
-        return render(request, 'lista.html', {'peliculas': peliculas, 'busco': True})
+        return render(request, 'busqueda.html', {'peliculas': peliculas, 'busco': True})
     else:
-        peliculas = get_peliculas_genero()
-        return render(request, 'lista.html', {'peliculas': peliculas})
+        peliculas_popular = get_peliculas_genero("popular")
+        peliculas_mejor = get_peliculas_genero("top_rated")
+        peliculas_proximamente = get_peliculas_genero("upcoming")
+        return render(request, 'lista.html', 
+                      {'peliculas_popular': peliculas_popular,
+                       'peliculas_mejor': peliculas_mejor,
+                       'peliculas_proximamente': peliculas_proximamente})
 
-def get_peliculas_genero():
-    url = "https://api.themoviedb.org/3/movie/now_playing"
+def get_peliculas_genero(tipo):
+    url = f'https://api.themoviedb.org/3/movie/{tipo}'
     url_generos = "https://api.themoviedb.org/3/genre/movie/list"
     params = {'api_key': TMDB_API_KEY, 'language': 'es'}
     response_peliculas = requests.get(url, params=params)
@@ -96,3 +105,13 @@ def buscar_por_genero(generos):
     response = requests.get(url, params=params)
     resultados = response.json()['results']
     return resultados
+
+def get_pelicula_video(id):
+    url = f'https://api.themoviedb.org/3/movie/{id}/videos'
+    params = {'api_key': TMDB_API_KEY, 'language': 'es'}
+    response = requests.get(url, params=params)
+    videos = response.json()['results']
+    if response.status_code == 200:
+        return videos
+    else:
+        return None
